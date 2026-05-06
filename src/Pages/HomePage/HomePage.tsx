@@ -10,11 +10,13 @@ import 'react-html5-camera-photo/build/css/index.css'
 
 export default function HomePage() {
 
-    const [openCamera, setCamersState] = useState(false)
-    const [files, setFiles] = useState([]);
-    const handleChange = (files: []) => {
+    const [openCamera, setCameraState] = useState(false)
+    const [files, setFiles] = useState<File[]>([]);
+    const handleChangeFiles = (files: File[]) => {
         setFiles([...files]);
     };
+
+    const [uploaderKey, setUploaderKey] = useState(0);
 
     const queryClient = useQueryClient();
 
@@ -25,7 +27,12 @@ export default function HomePage() {
             queryClient.invalidateQueries({
                 queryKey: ['api/documents']
             })
-            setFiles([]);
+
+            handleChangeFiles([]);
+            setUploaderKey(prev => prev + 1);
+        },
+        onError: (error) => {
+            console.error('Upload failed:', error);
         }
     }, queryClient)
 
@@ -39,7 +46,7 @@ export default function HomePage() {
         })
     }, queryClient)
 
-    const fileTypes = ["JPG", "PNG", "GIF"];
+    const fileTypes = ["JPG", "PNG", "JPEG"];
 
     const onUpload = async () => {
 
@@ -61,6 +68,7 @@ export default function HomePage() {
             r.blob().then(b =>{
                 formData.append('images', b, "camera_photo_" + Date.now())
                 upload.mutate(formData)
+                setCameraState(false);
             })
         })
     }
@@ -69,14 +77,13 @@ export default function HomePage() {
         console.log('handleCameraError', error);
     }
 
-
     return (
         <>
             <Box sx={{display: 'flex', justifyContent: 'space-around'}}>
                 <Box className='paper-outlined' sx={{ borderRadius: '50%', mb: 1, }}>
                     <Box className='camera-button'
                         component={'a'}
-                        onClick={() => setCamersState(!openCamera)}
+                        onClick={() => setCameraState(!openCamera)}
                         >
                         <Typography>
                             Камера
@@ -87,22 +94,23 @@ export default function HomePage() {
 
             {openCamera &&
                 <Box className='paper-outlined' sx={{ mb: 1, }}>
-                    
-                        <Camera
-                            onTakePhoto={(dataUri: any) => { handleTakePhoto(dataUri); }}
-                            idealFacingMode={undefined}
-                            imageType='jpg'
-                            isFullscreen={false}
-                            onCameraError={handleCameraError}
-                        />
+                    <Camera
+                        onTakePhoto={(dataUri: any) => { handleTakePhoto(dataUri); }}
+                        idealFacingMode={undefined}
+                        imageType='jpg'
+                        isFullscreen={false}
+                        onCameraError={handleCameraError}
+                    />
                 </Box>
             }
 
             <Box className='drag-n-drop' >
                 <FileUpload
-                    onFilesChange={handleChange}
+                    key={uploaderKey}
+                    files={files}
+                    onFilesChange={handleChangeFiles}
                     multiFile
-                    title={null}
+                    title={""}
                     header="Перенесите"
                     leftLabel="или"
                     buttonLabel="выберите"
@@ -110,9 +118,10 @@ export default function HomePage() {
                     buttonRemoveLabel="Удалить все"
                     acceptedType={'image/*'}
                     allowedExtensions={fileTypes}
+                    showPlaceholderImage={false}
                 />
                 <div className='actions'>
-                    <Button onClick={onUpload}>
+                    <Button onClick={onUpload} disabled={files.length === 0}>
                         Обработать
                     </Button>
                 </div>
