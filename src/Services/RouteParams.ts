@@ -12,7 +12,7 @@ export class RouteParams {
     static generateRouteParamList<TValue>(params: Record<string, TValue>) {
         const result: string[] = [];
         for (const key in params) {
-            if (!params[key])
+            if (params[key] === undefined || params[key] === null)
                 continue;
 
             const value = params[key];

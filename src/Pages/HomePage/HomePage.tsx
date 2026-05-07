@@ -4,9 +4,10 @@ import { post, get } from '../../Services/ApiClient';
 import FileUpload from "react-mui-fileuploader"
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { endOfToday, startOfToday } from 'date-fns';
-import Table from '@mui/joy/Table';
 import Camera from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css'
+import { IRecognizedDocumentDto } from '../../Interfaces/IRecognizedDocumentDto';
+import DocumentTable from '../../Components/DocumentTable';
 
 export default function HomePage() {
 
@@ -36,7 +37,7 @@ export default function HomePage() {
         }
     }, queryClient)
 
-    const { data } = useQuery<any[]>({
+    const { data } = useQuery<IRecognizedDocumentDto[]>({
         queryKey: ['api/documents', startOfToday(), endOfToday()],
         queryFn: () => get('api/documents', {
             params: {
@@ -127,29 +128,7 @@ export default function HomePage() {
                 </div>
             </Box>
 
-            {(data?.length ?? 0) > 0 &&
-                <Box sx={{ border: '1px solid #d0dae3', borderRadius: 8, mt: '10px' }}>
-                    <Table aria-label="basic table" hoverRow>
-                        <caption>История</caption>
-                        <thead>
-                            <tr>
-                                <th>Файл</th>
-                                <th>Текст</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                data!.map((row) => (
-                                    <tr key={row.documentId}>
-                                        <td>{row.fileName}</td>
-                                        <td>{row.content}</td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </Table>
-                </Box>
-            }
+            <DocumentTable data={data!} title="История на сегодня"/>
         </>
     )
 }

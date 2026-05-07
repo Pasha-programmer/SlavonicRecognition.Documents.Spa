@@ -1,41 +1,18 @@
-import { Box, Stack, Table } from "@mui/joy";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { get } from "../../Services/ApiClient";
+import { IRecognizedDocumentDto } from "../../Interfaces/IRecognizedDocumentDto";
+import DocumentTable from "../../Components/DocumentTable";
 
-export default function DocumentsPage(){
+export default function DocumentsPage(props: { title: string }) {
 
     const queryClient = useQueryClient();
 
-    const { data } = useQuery<any[]>({
+    const { data } = useQuery<IRecognizedDocumentDto[]>({
         queryKey: ['api/documents'],
         queryFn: () => get('api/documents')
     }, queryClient)
 
-    return(
-        <Box sx={{border: '1px solid #d0dae3', borderRadius: 8}}>
-            <Stack spacing={2}>
-                    {data &&
-                        <Table aria-label="basic table" hoverRow>
-                            <caption>Все документы</caption>
-                            <thead>
-                                <tr>
-                                    <th>Файл</th>
-                                    <th>Текст</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    data.map((row) => (
-                                        <tr key={row.documentId}>
-                                            <td>{row.fileName}</td>
-                                            <td>{row.content}</td>
-                                        </tr>
-                                    ))
-                                }
-                            </tbody>
-                        </Table>
-                    }
-                </Stack>
-        </Box>
+    return (
+        <DocumentTable data={data!} title={props.title}/>
     )
 }
