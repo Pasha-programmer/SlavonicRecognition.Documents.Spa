@@ -9,7 +9,7 @@ export default function DocumentsPage(props: { title: string }) {
 
     const { data } = useQuery<IRecognizedDocumentDto[]>({
         queryKey: ['api/documents'],
-        queryFn: () => get('api/documents')
+        queryFn: () => get('api/documents'),
     }, queryClient)
 
     return (

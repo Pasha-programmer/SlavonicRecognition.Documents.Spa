@@ -8,8 +8,8 @@ export default function Menu(){
             <Stack spacing={2}>
                 <MenuList>
                     <MenuItem component='a' href={RoutePaths.Documents}>Все документы</MenuItem>
-                    <MenuItem component='a' href={RoutePaths.RecignizedDocuments}>Распознанные документы</MenuItem>
-                    <MenuItem component='a' href={RoutePaths.Queue}>Очередь</MenuItem>
+                    <MenuItem component='a' href={RoutePaths.RecognizedDocuments}>Распознанные документы</MenuItem>
+                    <MenuItem component='a' href={RoutePaths.NotProcessedDocuments}>Необработанные файлы</MenuItem>
                 </MenuList>
             </Stack>
         </Box>

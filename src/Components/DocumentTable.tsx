@@ -2,7 +2,7 @@ import { Box, Stack, Table } from "@mui/joy";
 import { Fragment, useEffect, useState } from "react";
 import { IRecognizedDocumentDto } from "../Interfaces/IRecognizedDocumentDto";
 
-export default function DocumentTable(props: { data: IRecognizedDocumentDto[], title: string}){
+export default function DocumentTable(props: { data: IRecognizedDocumentDto[], title: string, actions?: (documentId: number) => JSX.Element}){
 
     const [imageUrls, setImageUrls] = useState<Map<number, string>>(new Map());
 
@@ -90,7 +90,6 @@ export default function DocumentTable(props: { data: IRecognizedDocumentDto[], t
         return base64ToBlob(base64Data, mime);
     };
 
-
     return (
         <Box sx={{ border: '1px solid #d0dae3', borderRadius: 8 }}>
             <Stack spacing={2}>
@@ -103,41 +102,51 @@ export default function DocumentTable(props: { data: IRecognizedDocumentDto[], t
                                 <th>Файл</th>
                                 <th>Символ</th>
                                 <th>Точность</th>
+                                { props.actions && <th></th> }
                             </tr>
                         </thead>
                         <tbody>
                             {
-                                props.data.map((row) => (
-                                    <Fragment key={row.documentId}>
-                                        <tr>
-                                            <td rowSpan={row.recognitionResults.length || 1}>
-                                                {imageUrls.get(row.documentId) && (
-                                                    <img
-                                                        src={imageUrls.get(row.documentId)}
-                                                        alt={row.fileName}
-                                                        style={{
-                                                            width: '50px',
-                                                            height: '50px',
-                                                            objectFit: 'cover',
-                                                            borderRadius: '4px'
-                                                        }}
-                                                    />
-                                                )}
-                                            </td>
-                                            <td rowSpan={row.recognitionResults.length || 1}>{row.fileName}</td>
-                                            <td>{row.recognitionResults[0]?.label}</td>
-                                            <td>{row.recognitionResults[0]?.probability}</td>
-                                        </tr>
-                                        {
-                                            row.recognitionResults.slice(1).map((rr, idx) => (
-                                                <tr key={`${row.documentId}-${idx}`}>
-                                                    <td>{rr.label}</td>
-                                                    <td>{rr.probability}</td>
-                                                </tr>
-                                            ))
-                                        }
-                                    </Fragment>
-                                ))
+                                props.data.sort((x, y) => y.documentId - x.documentId).map((row) => {
+                                    row.recognitionResults = row.recognitionResults.sort((x, y) => y.probability - x.probability)
+                                    return (
+                                        <Fragment key={row.documentId}>
+                                            <tr>
+                                                <td rowSpan={row.recognitionResults.length || 1}>
+                                                    {imageUrls.get(row.documentId) && (
+                                                        <img
+                                                            src={imageUrls.get(row.documentId)}
+                                                            alt={row.fileName}
+                                                            style={{
+                                                                width: '50px',
+                                                                height: '50px',
+                                                                objectFit: 'cover',
+                                                                borderRadius: '4px'
+                                                            }}
+                                                        />
+                                                    )}
+                                                </td>
+                                                <td rowSpan={row.recognitionResults.length || 1}>{row.fileName}</td>
+                                                <td>{row.recognitionResults[0]?.label}</td>
+                                                <td>{row.recognitionResults[0]?.probability}</td>
+                                                {
+                                                    props.actions && 
+                                                    <td rowSpan={row.recognitionResults.length || 1}>
+                                                        {props.actions(row.documentId)}
+                                                    </td>
+                                                }
+                                            </tr>
+                                            {
+                                                row.recognitionResults.slice(1).map((rr, idx) => (
+                                                    <tr key={`${row.documentId}-${idx}`}>
+                                                        <td>{rr.label}</td>
+                                                        <td>{rr.probability}</td>
+                                                    </tr>
+                                                ))
+                                            }
+                                        </Fragment>
+                                    )
+                                })
                             }
                         </tbody>
                     </Table>

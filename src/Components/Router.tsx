@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../Pages/HomePage/HomePage";
 import DocumentsPage from "../Pages/DocumentsPage/DocumentsPage";
 import RecignizedDocumentsPage from "../Pages/RecignizedDocumentsPage/RecignizedDocuments";
-import QueuePage from "../Pages/QueuePage/QueuePage";
+import NotProcessedDocumentsPage from "../Pages/NotProcessedDocumentsPage/NotProcessedDocumentsPage";
 import { RoutePaths } from "../Constants/RoutePaths";
 
 export default function Router(){
@@ -14,8 +14,8 @@ export default function Router(){
             <Route path="/" element={<HomePage />} />
             <Route path={RoutePaths.Home} element={<HomePage />} />
             <Route path={RoutePaths.Documents} element={<DocumentsPage />} />
-            <Route path={RoutePaths.RecignizedDocuments} element={<RecignizedDocumentsPage />} />
-            <Route path={RoutePaths.Queue} element={<QueuePage />} />
+            <Route path={RoutePaths.RecognizedDocuments} element={<RecignizedDocumentsPage />} />
+            <Route path={RoutePaths.NotProcessedDocuments} element={<NotProcessedDocumentsPage />} />
         </Routes>
     )
 }
